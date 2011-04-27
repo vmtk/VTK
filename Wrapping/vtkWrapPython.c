@@ -712,7 +712,7 @@ static char vtkWrapPython_FormatChar(unsigned int argtype)
 
 static char *vtkWrapPython_FormatString(FunctionInfo *currentFunction)
 {
-  static char result[1024];
+  static char result[2048]; /* max literal string length */
   size_t currPos = 0;
   ValueInfo *arg;
   unsigned int argtype;
@@ -777,7 +777,7 @@ static char *vtkWrapPython_FormatString(FunctionInfo *currentFunction)
 static char *vtkWrapPython_ArgCheckString(
   int isvtkobjmethod, FunctionInfo *currentFunction)
 {
-  static char result[1024];
+  static char result[2048]; /* max literal string length */
   size_t currPos = 0;
   ValueInfo *arg;
   unsigned int argtype;
@@ -1132,7 +1132,7 @@ static int *vtkWrapPython_ArgCountToOverloadMap(
   FunctionInfo **wrappedFunctions, int numberOfWrappedFunctions,
   int fnum, int is_vtkobject, int *nmax, int *overlap)
 {
-  static int overloadMap[100];
+  static int overloadMap[512];
   int totalArgs, requiredArgs;
   int occ, occCounter;
   FunctionInfo *theOccurrence;
@@ -3044,19 +3044,24 @@ static void vtkWrapPython_SpecialObjectProtocols(
 
     /* return the result */
     fprintf(fp,
+      "  if (result == -1)\n"
+      "    {\n"
+      "    PyErr_SetString(PyExc_TypeError, (char *)\"operation not available\");\n"
+      "    return NULL;\n"
+      "    }\n"
+      "\n"
+      "#if PY_VERSION_HEX >= 0x02030000\n"
+      "  // avoids aliasing issues with Py_INCREF(Py_False)\n"
+      "  return PyBool_FromLong((long)result);\n"
+      "#else\n"
       "  if (result == 0)\n"
       "    {\n"
       "    Py_INCREF(Py_False);\n"
       "    return Py_False;\n"
       "    }\n"
-      "  else if (result != -1)\n"
-      "    {\n"
-      "    Py_INCREF(Py_True);\n"
-      "    return Py_True;\n"
-      "    }\n"
-      "\n"
-      "  PyErr_SetString(PyExc_TypeError, (char *)\"operation not available\");\n"
-      "  return NULL;\n"
+      "  Py_INCREF(Py_True);\n"
+      "  return Py_True;\n"
+      "#endif\n"
       "}\n"
       "#endif\n"
       "\n");
