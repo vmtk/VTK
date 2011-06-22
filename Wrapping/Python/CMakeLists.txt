@@ -10,6 +10,7 @@ SET(VTK_PYTHON_CORE_SRCS
   PyVTKMutableObject.cxx
   PyVTKObject.cxx
   PyVTKSpecialObject.cxx
+  PyVTKTemplate.cxx
 )
 
 # SIP directory will be searched before other python dirs
@@ -38,6 +39,7 @@ IF(NOT VTK_INSTALL_NO_DEVELOPMENT)
     PyVTKClass.h
     PyVTKObject.h
     PyVTKSpecialObject.h
+    PyVTKTemplate.h
     PyVTKMutableObject.h
   )
   INSTALL(FILES ${__inst_files}
