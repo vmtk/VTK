@@ -69,20 +69,24 @@ public:
   virtual void Initialize();
 
   // Description:
-  // Change the window to fill the entire screen.
+  // Change the window to fill the entire screen.  This is only partially
+  // implemented for the vtkCocoaRenderWindow.  It can only be called
+  // before the window has been created, and it might not work on all
+  // versions of OS X.
   virtual void SetFullScreen(int);
 
   // Description:
-  // Remap the window.
+  // Remap the window.  This is not implemented for the vtkCocoaRenderWindow.
   virtual void WindowRemap();
 
   // Description:
-  // Set the preferred window size to full screen.
+  // Set the preferred window size to full screen.  This is not implemented
+  // for the vtkCocoaRenderWindow.
   virtual void PrefFullScreen();
 
   // Description:
   // Set the size of the window in pixels.
-  virtual void SetSize(int*);
+  virtual void SetSize(int a[2]);
   virtual void SetSize(int,int);
 
   // Description:
@@ -91,7 +95,7 @@ public:
 
   // Description:
   // Set the position of the window.
-  virtual void SetPosition(int*);
+  virtual void SetPosition(int a[2]);
   virtual void SetPosition(int,int);
   
   // Description:
@@ -199,10 +203,6 @@ public:
   // Description:
   // Clean up device contexts, rendering contexts, etc.
   void Finalize();
-
-  // Description:
-  // Register a texture name with this render window
-  void RegisterTextureResource (GLuint id);
 
   // Description:
   // Get the size of the depth buffer.

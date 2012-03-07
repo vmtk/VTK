@@ -20,12 +20,17 @@ CREATE_TEST_SOURCELIST(Tests ${KIT}CxxTests.cxx
   TestMinimalStandardRandomSequence.cxx
   TestNew.cxx
   TestObservers.cxx
+  TestPlane.cxx
+  TestBoundingBox.cxx
   TestPolynomialSolversUnivariate.cxx
   TestSmartPointer.cxx
   TestSortDataArray.cxx
+  TestStructuredData.cxx
   TestUnicodeStringAPI.cxx
   TestUnicodeStringArrayAPI.cxx
   TestVariantComparison.cxx
+  TestVector.cxx
+  TestVectorOperators.cxx
   TestWeakPointer.cxx
   TestSystemInformation.cxx
   EXTRA_INCLUDE vtkTestDriver.h

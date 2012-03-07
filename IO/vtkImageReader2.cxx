@@ -21,6 +21,7 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
+#include "vtkErrorCode.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStringArray.h"
 
@@ -508,9 +509,15 @@ int vtkImageReader2::RequestInformation (
   vtkInformationVector** vtkNotUsed( inputVector ),
   vtkInformationVector * outputVector)
 {
+  this->SetErrorCode( vtkErrorCode::NoError );
   // call for backwards compatibility
   this->ExecuteInformation();
-  
+  // Check for any error set by downstream filter (IO in most case)
+  if ( this->GetErrorCode() )
+    {
+    return 0;
+    }
+
   // get the info objects
   vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
@@ -800,7 +807,6 @@ void vtkImageReader2::ExecuteData(vtkDataObject *output)
   vtkImageData *data = this->AllocateOutputData(output);
   
   void *ptr;
-  int *ext;
   
   if (!this->FileName && !this->FilePattern)
     {
@@ -808,9 +814,11 @@ void vtkImageReader2::ExecuteData(vtkDataObject *output)
     return;
     }
 
-  ext = data->GetExtent();
-
   data->GetPointData()->GetScalars()->SetName("ImageFile");
+
+#ifndef NDEBUG
+  int *ext = data->GetExtent();
+#endif
 
   vtkDebugMacro("Reading extent: " << ext[0] << ", " << ext[1] << ", " 
         << ext[2] << ", " << ext[3] << ", " << ext[4] << ", " << ext[5]);

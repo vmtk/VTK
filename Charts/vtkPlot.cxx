@@ -34,37 +34,24 @@ vtkCxxSetObjectMacro(vtkPlot, YAxis, vtkAxis);
 //-----------------------------------------------------------------------------
 vtkPlot::vtkPlot()
 {
-  this->Pen = vtkPen::New();
+  this->Pen = vtkSmartPointer<vtkPen>::New();
   this->Pen->SetWidth(2.0);
-  this->Brush = vtkBrush::New();
+  this->Brush = vtkSmartPointer<vtkBrush>::New();
   this->Labels = NULL;
   this->UseIndexForXSeries = false;
-  this->Data = vtkContextMapper2D::New();
+  this->Data = vtkSmartPointer<vtkContextMapper2D>::New();
   this->Selection = NULL;
   this->XAxis = NULL;
   this->YAxis = NULL;
 
   this->TooltipDefaultLabelFormat = "%l: %x,  %y";
+  this->TooltipNotation = vtkAxis::STANDARD_NOTATION;
+  this->TooltipPrecision = 6;
 }
 
 //-----------------------------------------------------------------------------
 vtkPlot::~vtkPlot()
 {
-  if (this->Pen)
-    {
-    this->Pen->Delete();
-    this->Pen = NULL;
-    }
-  if (this->Brush)
-    {
-    this->Brush->Delete();
-    this->Brush = NULL;
-    }
-  if (this->Data)
-    {
-    this->Data->Delete();
-    this->Data = NULL;
-    }
   if (this->Selection)
     {
     this->Selection->Delete();
@@ -149,12 +136,16 @@ vtkStdString vtkPlot::GetNumber(double position, vtkAxis *axis)
 {
   // Determine and format the X and Y position in the chart
   vtksys_ios::ostringstream ostr;
-  ostr.imbue(vtkstd::locale::classic());
-  ostr.setf(ios::fixed, ios::floatfield);
+  ostr.imbue(std::locale::classic());
+  ostr.precision(this->GetTooltipPrecision());
 
-  if (axis)
+  if(this->GetTooltipNotation() == vtkAxis::SCIENTIFIC_NOTATION)
     {
-    ostr.precision(this->XAxis->GetPrecision());
+    ostr.setf(ios::scientific, ios::floatfield);
+    }
+  else if(this->GetTooltipNotation() == vtkAxis::FIXED_NOTATION)
+    {
+    ostr.setf(ios::fixed, ios::floatfield);
     }
 
   if (axis && axis->GetLogScale())
@@ -215,6 +206,38 @@ void vtkPlot::SetWidth(float width)
 float vtkPlot::GetWidth()
 {
   return this->Pen->GetWidth();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPlot::SetPen(vtkPen *pen)
+{
+  if (this->Pen != pen)
+    {
+    this->Pen = pen;
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkPen* vtkPlot::GetPen()
+{
+  return this->Pen.GetPointer();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPlot::SetBrush(vtkBrush *brush)
+{
+  if (this->Brush != brush)
+    {
+    this->Brush = brush;
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkBrush* vtkPlot::GetBrush()
+{
+  return this->Brush.GetPointer();
 }
 
 //-----------------------------------------------------------------------------
@@ -309,6 +332,12 @@ vtkStringArray * vtkPlot::GetIndexedLabels()
 }
 
 //-----------------------------------------------------------------------------
+vtkContextMapper2D * vtkPlot::GetData()
+{
+  return this->Data.GetPointer();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPlot::SetTooltipLabelFormat(const vtkStdString &labelFormat)
 {
   if (this->TooltipLabelFormat == labelFormat)
@@ -324,6 +353,32 @@ void vtkPlot::SetTooltipLabelFormat(const vtkStdString &labelFormat)
 vtkStdString vtkPlot::GetTooltipLabelFormat()
 {
   return this->TooltipLabelFormat;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPlot::SetTooltipNotation(int notation)
+{
+  this->TooltipNotation = notation;
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+int vtkPlot::GetTooltipNotation()
+{
+  return this->TooltipNotation;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPlot::SetTooltipPrecision(int precision)
+{
+  this->TooltipPrecision = precision;
+  this->Modified();
+}
+
+//-----------------------------------------------------------------------------
+int vtkPlot::GetTooltipPrecision()
+{
+  return this->TooltipPrecision;
 }
 
 //-----------------------------------------------------------------------------

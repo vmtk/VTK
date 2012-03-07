@@ -1,8 +1,14 @@
+# Always add these tests
+SET(MyTests
+  TestCenterOfMass.cxx
+  )
+
 # if we have rendering add the following tests
 IF (VTK_USE_RENDERING AND VTK_USE_DISPLAY)
   SET(KIT Graphics)
   # add tests that do not require data
   SET(MyTests
+    ${MyTests}
     Mace.cxx
     expCos.cxx
     BoxClipTriangulate.cxx
@@ -13,30 +19,42 @@ IF (VTK_USE_RENDERING AND VTK_USE_DISPLAY)
     TestAppendSelection.cxx
 #    TestAppendPolyData.cxx #pending a bug fix
     TestAssignAttribute.cxx
+    TestBareScalarsToColors.cxx
     TestBSPTree.cxx
     TestCellDataToPointData.cxx
     TestDensifyPolyData.cxx
     TestClipHyperOctree.cxx
     TestConvertSelection.cxx
     TestDelaunay2D.cxx
+    TestGlyph3D.cxx
     TestExtraction.cxx
     TestExtractSelection.cxx
+    TestExtractSurfaceNonLinearSubdivision.cxx
     TestHyperOctreeContourFilter.cxx
     TestHyperOctreeCutter.cxx
     TestHyperOctreeDual.cxx
     TestHyperOctreeSurfaceFilter.cxx
     TestHyperOctreeToUniformGrid.cxx
+    TestImageDataToPointSet.cxx
+    TestLineSource.cxx
+    TestMapVectorsAsRGBColors.cxx
+    TestMapVectorsToColors.cxx
     TestNamedComponents.cxx
     TestMeanValueCoordinatesInterpolation1.cxx
     TestMeanValueCoordinatesInterpolation2.cxx
     TestPolyDataPointSampler.cxx
     TestPolyhedron0.cxx
     TestPolyhedron1.cxx
+    TestQuadRotationalExtrusion.cxx
+    TestRectilinearGridToPointSet.cxx
+    TestReflectionFilter.cxx
+    TestRotationalExtrusion.cxx
     TestSelectEnclosedPoints.cxx
     TestTessellatedBoxSource.cxx
     TestTessellator.cxx
     TestUncertaintyTubeFilter.cxx
     TestDecimatePolylineFilter.cxx
+    TestImplicitPolyDataDistance.cxx
     )
 
   IF(VTK_USE_BOOST)
@@ -79,10 +97,16 @@ IF (VTK_USE_RENDERING AND VTK_USE_DISPLAY)
       TestIncrementalOctreePointLocator.cxx
       TestMultiBlock.cxx
       TestQuadraturePoints.cxx
+      TestQuadRotationalExtrusionMultiBlock.cxx
       TestUnstructuredGridGeometryFilter.cxx
       UnstructuredGridGradients.cxx
       UnstructuredGridCellGradients.cxx
       UnstructuredGridFastGradients.cxx
+      TestBooleanOperationPolyDataFilter.cxx
+      TestBooleanOperationPolyDataFilter2.cxx
+      TestDistancePolyDataFilter.cxx
+      TestIntersectionPolyDataFilter.cxx
+      TestYoungsMaterialInterface.cxx
       )
     IF (VTK_USE_PARALLEL)
       SET(MyTests ${MyTests}
@@ -90,8 +114,9 @@ IF (VTK_USE_RENDERING AND VTK_USE_DISPLAY)
         )
     ENDIF (VTK_USE_PARALLEL)
   ENDIF (VTK_DATA_ROOT)
-  CREATE_TEST_SOURCELIST(Tests ${KIT}CxxTests.cxx ${MyTests}
-                         EXTRA_INCLUDE vtkTestDriver.h)
+
+  INCLUDE(${VTK_SOURCE_DIR}/Rendering/vtkTestingObjectFactory.cmake)
+
   ADD_EXECUTABLE(${KIT}CxxTests ${Tests})
   TARGET_LINK_LIBRARIES(${KIT}CxxTests vtkRendering vtkIO)
   IF (VTK_USE_PARALLEL)

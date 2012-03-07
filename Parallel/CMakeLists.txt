@@ -4,7 +4,7 @@ SET(KIT_TCL_LIBS vtkIOTCL)
 SET(KIT_PYTHON_LIBS vtkIOPythonD)
 SET(KIT_JAVA_LIBS vtkIOJava)
 SET(KIT_INTERFACE_LIBRARIES vtkIO)
-SET(KIT_LIBS VPIC Cosmo)
+SET(KIT_LIBS VPIC Cosmo LSDyna)
 IF(VTK_USE_RENDERING)
   SET(KIT_TCL_LIBS vtkRenderingTCL ${KIT_TCL_LIBS})
   SET(KIT_PYTHON_LIBS vtkRenderingPythonD ${KIT_PYTHON_LIBS})
@@ -62,6 +62,7 @@ vtkPieceRequestFilter.cxx
 vtkPieceScalars.cxx
 vtkPKdTree.cxx
 vtkPLinearExtrusionFilter.cxx
+vtkPMaskPoints.cxx
 vtkPNrrdReader.cxx
 vtkPOPReader.cxx
 vtkPOpenFOAMReader.cxx
@@ -72,11 +73,13 @@ vtkPProbeFilter.cxx
 vtkProcess.cxx
 vtkProcessGroup.cxx
 vtkProcessIdScalars.cxx
+vtkPLSDynaReader.cxx
 vtkPReflectionFilter.cxx
 vtkPSLACReader.cxx
 vtkPSphereSource.cxx
 vtkPStreamTracer.cxx
 vtkPTableToStructuredGrid.cxx
+vtkPYoungsMaterialInterface.cxx
 vtkRectilinearGridOutlineFilter.cxx
 vtkSocketCommunicator.cxx
 vtkSocketController.cxx
@@ -114,8 +117,8 @@ IF(VTK_USE_RENDERING)
     )
 
 # The set of source files to be encoded.
-SET(glsl_files
-  vtkCompositeZPassShader_fs
+SET(shader_files
+  vtkCompositeZPassShader_fs.glsl
   )
 ENDIF(VTK_USE_RENDERING)
 
@@ -151,12 +154,13 @@ ENDIF(VTK_USE_RENDERING)
 IF (VTK_USE_MPI)
   INCLUDE (FindMPI)
 
-  INCLUDE_DIRECTORIES("${MPI_INCLUDE_PATH}")
+  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 
   SET ( Kit_SRCS
     ${Kit_SRCS}
     vtkMPICommunicator.cxx
     vtkMPIController.cxx 
+    vtkPNetCDFPOPReader.cxx
     )
   # Needed for mpich 2
   ADD_DEFINITIONS("-DMPICH_IGNORE_CXX_SEEK")
@@ -224,17 +228,18 @@ IF(VTK_USE_RENDERING)
 # Create custom commands to encode each assembly file into a C string
 # literal in a header file.
 
-SET(glsl_h_files)
-FOREACH(file ${glsl_files})
-  SET(src ${VTK_SOURCE_DIR}/Parallel/${file}.glsl)
-  SET(res ${VTK_BINARY_DIR}/Parallel/${file}.cxx)
-  SET(resh ${VTK_BINARY_DIR}/Parallel/${file}.h)
-  SET(glsl_h_files ${glsl_h_files} "${resh}")
+SET(shader_h_files)
+FOREACH(file ${shader_files})
+  GET_FILENAME_COMPONENT(file_we ${file} NAME_WE)
+  SET(src ${VTK_SOURCE_DIR}/Parallel/${file})
+  SET(res ${VTK_BINARY_DIR}/Parallel/${file_we}.cxx)
+  SET(resh ${VTK_BINARY_DIR}/Parallel/${file_we}.h)
+  SET(shader_h_files ${shader_h_files} "${resh}")
   ADD_CUSTOM_COMMAND(
     OUTPUT ${res} ${resh}
     DEPENDS ${src} vtkEncodeString
     COMMAND ${VTK_ENCODESTRING_EXE}
-    ARGS ${res} ${src} ${file} --build-header VTK_PARALLEL_EXPORT vtkSystemIncludes.h
+    ARGS ${res} ${src} ${file_we} --build-header VTK_PARALLEL_EXPORT vtkSystemIncludes.h
     )
   SET(Kit_EXTRA_SRCS ${Kit_EXTRA_SRCS} ${res})
 ENDFOREACH(file)

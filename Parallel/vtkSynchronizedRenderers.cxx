@@ -19,6 +19,7 @@
 #include "vtkCommand.h"
 #include "vtkCommunicator.h"
 #include "vtkImageData.h"
+#include "vtkMatrix4x4.h"
 #include "vtkMultiProcessController.h"
 #include "vtkMultiProcessStream.h"
 #include "vtkObjectFactory.h"
@@ -411,7 +412,39 @@ void vtkSynchronizedRenderers::RendererInfo::Save(vtkMultiProcessStream& stream)
          << this->CameraClippingRange[0]
          << this->CameraClippingRange[1]
          << this->CameraViewAngle
-         << this->CameraParallelScale;
+         << this->CameraParallelScale
+         << this->HeadPose[0]
+         << this->HeadPose[1]
+         << this->HeadPose[2]
+         << this->HeadPose[3]
+         << this->HeadPose[4]
+         << this->HeadPose[5]
+         << this->HeadPose[6]
+         << this->HeadPose[7]
+         << this->HeadPose[8]
+         << this->HeadPose[9]
+         << this->HeadPose[10]
+         << this->HeadPose[11]
+         << this->HeadPose[12]
+         << this->HeadPose[13]
+         << this->HeadPose[14]
+         << this->HeadPose[15]
+         << this->WandPose[0]
+         << this->WandPose[1]
+         << this->WandPose[2]
+         << this->WandPose[3]
+         << this->WandPose[4]
+         << this->WandPose[5]
+         << this->WandPose[6]
+         << this->WandPose[7]
+         << this->WandPose[8]
+         << this->WandPose[9]
+         << this->WandPose[10]
+         << this->WandPose[11]
+         << this->WandPose[12]
+         << this->WandPose[13]
+         << this->WandPose[14]
+         << this->WandPose[15];
 }
 
 //----------------------------------------------------------------------------
@@ -426,9 +459,9 @@ bool vtkSynchronizedRenderers::RendererInfo::Restore(vtkMultiProcessStream& stre
   stream >> this->ImageReductionFactor
          >> this->Draw
          >> this->CameraParallelProjection
-         >> this->Viewport[0] 
+         >> this->Viewport[0]
          >> this->Viewport[1]
-         >> this->Viewport[2] 
+         >> this->Viewport[2]
          >> this->Viewport[3]
          >> this->CameraPosition[0]
          >> this->CameraPosition[1]
@@ -444,7 +477,39 @@ bool vtkSynchronizedRenderers::RendererInfo::Restore(vtkMultiProcessStream& stre
          >> this->CameraClippingRange[0]
          >> this->CameraClippingRange[1]
          >> this->CameraViewAngle
-         >> this->CameraParallelScale;
+         >> this->CameraParallelScale
+         >> this->HeadPose[0]
+         >> this->HeadPose[1]
+         >> this->HeadPose[2]
+         >> this->HeadPose[3]
+         >> this->HeadPose[4]
+         >> this->HeadPose[5]
+         >> this->HeadPose[6]
+         >> this->HeadPose[7]
+         >> this->HeadPose[8]
+         >> this->HeadPose[9]
+         >> this->HeadPose[10]
+         >> this->HeadPose[11]
+         >> this->HeadPose[12]
+         >> this->HeadPose[13]
+         >> this->HeadPose[14]
+         >> this->HeadPose[15]
+         >> this->WandPose[0]
+         >> this->WandPose[1]
+         >> this->WandPose[2]
+         >> this->WandPose[3]
+         >> this->WandPose[4]
+         >> this->WandPose[5]
+         >> this->WandPose[6]
+         >> this->WandPose[7]
+         >> this->WandPose[8]
+         >> this->WandPose[9]
+         >> this->WandPose[10]
+         >> this->WandPose[11]
+         >> this->WandPose[12]
+         >> this->WandPose[13]
+         >> this->WandPose[14]
+         >> this->WandPose[15];
   return true;
 }
 
@@ -462,6 +527,17 @@ void vtkSynchronizedRenderers::RendererInfo::CopyFrom(vtkRenderer* ren)
   cam->GetClippingRange(this->CameraClippingRange);
   this->CameraViewAngle = cam->GetViewAngle();
   this->CameraParallelScale = cam->GetParallelScale();
+
+  vtkMatrix4x4 *headMatrix = cam->GetEyeTransformMatrix();
+  vtkMatrix4x4 *wandMatrix = cam->GetModelTransformMatrix();
+  for(int i=0; i < 4; ++i)
+    {
+    for(int j=0; j < 4; ++j)
+      {
+       this->HeadPose[i*4 + j] = headMatrix->GetElement(i, j);
+       this->WandPose[i*4 + j] = wandMatrix->GetElement(i, j);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -475,10 +551,25 @@ void vtkSynchronizedRenderers::RendererInfo::CopyTo(vtkRenderer* ren)
   cam->SetFocalPoint(this->CameraFocalPoint);
   cam->SetViewUp(this->CameraViewUp);
   cam->SetWindowCenter(this->CameraWindowCenter[0],
-    this->CameraWindowCenter[1]);
+                       this->CameraWindowCenter[1]);
   cam->SetClippingRange(this->CameraClippingRange);
   cam->SetViewAngle(this->CameraViewAngle);
   cam->SetParallelScale(this->CameraParallelScale);
+
+  vtkMatrix4x4 *headMatrix = vtkMatrix4x4::New();
+  vtkMatrix4x4 *wandMatrix = vtkMatrix4x4::New();
+  for(int i=0; i < 4; ++i)
+    {
+    for(int j=0; j < 4; ++j)
+      {
+      headMatrix->SetElement(i, j, this->HeadPose[i * 4 + j]);
+      wandMatrix->SetElement(i, j, this->WandPose[i * 4 + j]);
+      }
+    }
+  cam->SetEyeTransformMatrix(headMatrix);
+  cam->SetModelTransformMatrix(wandMatrix);
+  headMatrix->Delete();
+  wandMatrix->Delete();
 }
 
 
@@ -498,7 +589,7 @@ void vtkSynchronizedRenderers::vtkRawImage::Initialize(
 //----------------------------------------------------------------------------
 void vtkSynchronizedRenderers::vtkRawImage::Allocate(int dx, int dy, int numcomps)
 {
-  if (dx*dy < this->Data->GetNumberOfTuples() &&
+  if (dx*dy <= this->Data->GetNumberOfTuples() &&
     this->Data->GetNumberOfComponents() == numcomps)
     {
     this->Size[0] = dx;
@@ -669,7 +760,7 @@ bool vtkSynchronizedRenderers::vtkRawImage::Capture(vtkRenderer* ren)
     static_cast<int>(window_size[0] * viewport[2])-1,
     static_cast<int>(window_size[1] * viewport[3])-1,
     ren->GetRenderWindow()->GetDoubleBuffer()? 0 : 1,
-    this->GetRawPtr()); 
+    this->GetRawPtr());
   this->MarkValid();
   return true;
 }

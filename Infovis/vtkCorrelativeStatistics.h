@@ -13,11 +13,11 @@ PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 /*-------------------------------------------------------------------------
-  Copyright 2010 Sandia Corporation.
+  Copyright 2011 Sandia Corporation.
   Under the terms of Contract DE-AC04-94AL85000 with Sandia Corporation,
   the U.S. Government retains certain rights in this software.
   -------------------------------------------------------------------------*/
-// .NAME vtkCorrelativeStatistics - A class for linear correlation
+// .NAME vtkCorrelativeStatistics - A class for bivariate linear correlation
 //
 // .SECTION Description
 // Given a selection of pairs of columns of interest, this class provides the
@@ -26,31 +26,32 @@ PURPOSE.  See the above copyright notice for more information.
 //   (cf. P. Pebay, Formulas for robust, one-pass parallel computation of covariances
 //   and Arbitrary-Order Statistical Moments, Sandia Report SAND2008-6212, Sep 2008,
 //   http://infoserve.sandia.gov/sand_doc/2008/086212.pdf for details)
-// * Derive: calculate unbiased variance and covariance estimators, estimator of
-//   standard deviations, linear regressions, and Pearson correlation coefficient.
+// * Derive: calculate unbiased covariance matrix estimators and its determinant, 
+//   linear regressions, and Pearson correlation coefficient.
 // * Assess: given an input data set, two means and a 2x2 covariance matrix,
 //   mark each datum with corresponding relative deviation (2-dimensional Mahlanobis
 //   distance).
-// * Test: no statistical tests available yet.
+// * Test: Perform Jarque-Bera-Srivastava test of 2-d normality
 //  
 // .SECTION Thanks
 // Thanks to Philippe Pebay and David Thompson from Sandia National Laboratories 
 // for implementing this class.
+// Updated by Philippe Pebay, Kitware SAS 2012
 
 #ifndef __vtkCorrelativeStatistics_h
 #define __vtkCorrelativeStatistics_h
 
-#include "vtkBivariateStatisticsAlgorithm.h"
+#include "vtkStatisticsAlgorithm.h"
 
 class vtkMultiBlockDataSet;
 class vtkStringArray;
 class vtkTable;
 class vtkVariant;
 
-class VTK_INFOVIS_EXPORT vtkCorrelativeStatistics : public vtkBivariateStatisticsAlgorithm
+class VTK_INFOVIS_EXPORT vtkCorrelativeStatistics : public vtkStatisticsAlgorithm
 {
 public:
-  vtkTypeMacro(vtkCorrelativeStatistics, vtkBivariateStatisticsAlgorithm);
+  vtkTypeMacro(vtkCorrelativeStatistics, vtkStatisticsAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkCorrelativeStatistics* New();
 
@@ -65,9 +66,9 @@ protected:
 
   // Description:
   // Execute the calculations required by the Learn option.
-  virtual void Learn( vtkTable* inData,
-                      vtkTable* inParameters,
-                      vtkMultiBlockDataSet* outMeta );
+  virtual void Learn( vtkTable*,
+                      vtkTable*,
+                      vtkMultiBlockDataSet* );
 
   // Description:
   // Execute the calculations required by the Derive option.
@@ -78,6 +79,13 @@ protected:
   virtual void Test( vtkTable*,
                      vtkMultiBlockDataSet*,
                      vtkTable* );
+
+  // Description:
+  // Execute the calculations required by the Assess option.
+  virtual void Assess( vtkTable* inData,
+                       vtkMultiBlockDataSet* inMeta,
+                       vtkTable* outData ) 
+  { this->Superclass::Assess( inData, inMeta, outData, 2 ); }
 
 //BTX  
   // Description:
@@ -94,4 +102,3 @@ private:
 };
 
 #endif
-

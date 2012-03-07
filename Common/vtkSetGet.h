@@ -201,6 +201,19 @@ void class::Set##name (type* _arg)              \
   }
 
 //
+// Get pointer to object wrapped in vtkNew.  Creates member Get"name"
+// (e.g., GetPoints()).  This macro should be used in the header file.
+//
+#define vtkGetNewMacro(name,type)                                    \
+virtual type *Get##name ()                                              \
+  {                                                                     \
+  vtkDebugMacro(<< this->GetClassName() << " (" << this                 \
+                << "): returning " #name " address "                    \
+                << this->name.GetPointer() );                           \
+  return this->name.GetPointer();                                       \
+  }
+
+//
 // Get pointer to object.  Creates member Get"name" (e.g., GetPoints()).
 // This macro should be used in the header file.
 //
@@ -505,7 +518,7 @@ extern VTK_COMMON_EXPORT void vtkOutputWindowDisplayDebugText(const char*);
      }                                                          \
    }
 
-#ifdef VTK_LEAN_AND_MEAN
+#ifdef NDEBUG
 # define vtkDebugWithObjectMacro(self, x)
 #else
 # define vtkDebugWithObjectMacro(self, x)                                     \
@@ -780,7 +793,7 @@ virtual double *Get##name() \
 #endif
 
 // Old-style legacy code marker macro.
-#if !defined(VTK_LEGACY_REMOVE) && !defined(VTK_LEAN_AND_MEAN)
+#if !defined(VTK_LEGACY_REMOVE) && !defined(NDEBUG)
 #define VTK_LEGACY_METHOD(oldMethod,versionStringMadeLegacy) \
   vtkErrorMacro(<< #oldMethod \
                 << " was obsoleted for version " << #versionStringMadeLegacy \

@@ -25,7 +25,7 @@
 #define __vtkPlot_h
 
 #include "vtkContextItem.h"
-#include "vtkStdString.h" // Needed to hold TooltipLabelFormat ivar
+#include "vtkStdString.h"     // Needed to hold TooltipLabelFormat ivar
 #include "vtkSmartPointer.h"  // Needed to hold SP ivars
 
 class vtkVariant;
@@ -68,6 +68,16 @@ public:
   virtual void SetTooltipLabelFormat(const vtkStdString &label);
   virtual vtkStdString GetTooltipLabelFormat();
 
+  // Description:
+  // Sets/gets the tooltip notation style.
+  virtual void SetTooltipNotation(int notation);
+  virtual int GetTooltipNotation();
+
+  // Description:
+  // Sets/gets the tooltip precision.
+  virtual void SetTooltipPrecision(int precision);
+  virtual int GetTooltipPrecision();
+
 //BTX
   // Description:
   // Generate and return the tooltip label string for this plot
@@ -106,14 +116,14 @@ public:
   virtual float GetWidth();
 
   // Description:
-  // Get a pointer to the vtkPen object that controls the was this plot draws
-  // lines.
-  vtkGetObjectMacro(Pen, vtkPen);
+  // Set/get the vtkPen object that controls how this plot draws (out)lines.
+  void SetPen(vtkPen *pen);
+  vtkPen* GetPen();
 
   // Description:
-  // Get a pointer to the vtkBrush object that controls the was this plot fills
-  // shapes.
-  vtkGetObjectMacro(Brush, vtkBrush);
+  // Set/get the vtkBrush object that controls how this plot fills shapes.
+  void SetBrush(vtkBrush *brush);
+  vtkBrush* GetBrush();
 
   // Description:
   // Set the label of this plot.
@@ -153,7 +163,7 @@ public:
 
   // Description:
   // Get the data object that the plot will draw.
-  vtkGetObjectMacro(Data, vtkContextMapper2D);
+  vtkContextMapper2D* GetData();
 
   // Description:
   // Use the Y array index for the X value. If true any X column setting will be
@@ -220,11 +230,11 @@ protected:
 
   // Description:
   // This object stores the vtkPen that controls how the plot is drawn.
-  vtkPen* Pen;
+  vtkSmartPointer<vtkPen> Pen;
 
   // Description:
   // This object stores the vtkBrush that controls how the plot is drawn.
-  vtkBrush* Brush;
+  vtkSmartPointer<vtkBrush> Brush;
 
   // Description:
   // Plot labels, used by legend.
@@ -246,7 +256,7 @@ protected:
   // Description:
   // This data member contains the data that will be plotted, it inherits
   // from vtkAlgorithm.
-  vtkContextMapper2D *Data;
+  vtkSmartPointer<vtkContextMapper2D> Data;
 
   // Description:
   // Selected indices for the table the plot is rendering
@@ -269,6 +279,9 @@ protected:
   // The default printf-style string to build custom tooltip labels from.
   // See the accessor/mutator functions for full documentation.
   vtkStdString TooltipDefaultLabelFormat;
+
+  int TooltipNotation;
+  int TooltipPrecision;
 
 private:
   vtkPlot(const vtkPlot &); // Not implemented.

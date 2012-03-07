@@ -11,15 +11,20 @@ IF (VTK_USE_RENDERING AND VTK_USE_DISPLAY)
         MultipleUpdateExtents
         reconstructSurface
         resampledTexture
+        ResliceBSpline
         ResliceColorWrap
         ResliceInformationInput
         ResliceInterpolationModes
         ResliceInterpolationOblique
+        ResliceLanczosKaiser
         ResliceMirrorOblique
         ResliceMirrorPad
         ResliceOptimizationOff
         ReslicePermutations
         ReslicePermuteResample
+        ReslicePermuteSlab
+        ResliceSlabModes
+        ResliceToColors
         ResliceWrapOblique
         ResliceWrapPad
         Spectrum
@@ -56,6 +61,7 @@ IF (VTK_USE_RENDERING AND VTK_USE_DISPLAY)
         TestIdealLowPass
         TestImageCanvas
         TestImageProjection
+        TestImageThresholdConnectivity
         TestImageWeightedSum
         TestInPlaceFilter
         TestIslandRemoval2D

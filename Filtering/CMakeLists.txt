@@ -6,7 +6,9 @@ SET(KIT_JAVA_LIBS vtkCommonJava)
 SET(KIT_INTERFACE_LIBRARIES vtkCommon)
 
 SET( Kit_SRCS
+vtkImageToStructuredGrid.cxx
 vtkAbstractCellLocator.cxx
+vtkAbstractImageInterpolator.cxx
 vtkAbstractInterpolatedVelocityField.cxx
 vtkAbstractMapper.cxx
 vtkAbstractPointLocator.cxx
@@ -19,11 +21,13 @@ vtkAMRBox.cxx
 vtkAnnotation.cxx
 vtkAnnotationLayers.cxx
 vtkAnnotationLayersAlgorithm.cxx
+vtkAtom.cxx
 vtkAttributesErrorMetric.cxx
 vtkBiQuadraticQuad.cxx
 vtkBiQuadraticQuadraticHexahedron.cxx
 vtkBiQuadraticQuadraticWedge.cxx
 vtkBiQuadraticTriangle.cxx
+vtkBond.cxx
 vtkBSPCuts.cxx
 vtkBSPIntersections.cxx
 vtkCachedStreamingDemandDrivenPipeline.cxx
@@ -35,6 +39,7 @@ vtkCell.cxx
 vtkCellData.cxx
 vtkCellLinks.cxx
 vtkCellLocator.cxx
+vtkCellTreeLocator.cxx
 vtkCellTypes.cxx
 vtkColorTransferFunction.cxx
 vtkCompositeDataIterator.cxx
@@ -95,6 +100,8 @@ vtkGraphAlgorithm.cxx
 vtkGraph.cxx
 vtkGraphEdge.cxx
 vtkGraphInternals.cxx
+vtkGraphWeightFilter.cxx
+vtkGraphWeightEuclideanDistanceFilter.cxx
 vtkHexagonalPrism.cxx
 vtkHexahedron.cxx
 vtkHierarchicalBoxDataIterator.cxx
@@ -105,12 +112,16 @@ vtkHyperOctreeCursor.cxx
 vtkHyperOctree.cxx
 vtkHyperOctreePointsGrabber.cxx
 vtkImageAlgorithm.cxx
+vtkImageBSplineInternals.cxx
+vtkImageBSplineInterpolator.cxx
 vtkImageData.cxx
 vtkImageInPlaceFilter.cxx
+vtkImageInterpolator.cxx
 vtkImageIterator.cxx
 vtkImageMultipleInputFilter.cxx
 vtkImageMultipleInputOutputFilter.cxx
 vtkImageProgressIterator.cxx
+vtkImageSincInterpolator.cxx
 vtkImageSource.cxx
 vtkImageToImageFilter.cxx
 vtkImageToStructuredPoints.cxx
@@ -135,10 +146,14 @@ vtkKdTree.cxx
 vtkKdTreePointLocator.cxx
 vtkKochanekSpline.cxx
 vtkLine.cxx
+vtkLinearSelector.cxx
 vtkLocator.cxx
 vtkMapper2D.cxx
 vtkMeanValueCoordinatesInterpolator.cxx
 vtkMergePoints.cxx
+vtkMarchingSquaresLineCases.cxx
+vtkMarchingCubesTriangleCases.cxx
+vtkMolecule.cxx
 vtkMultiBlockDataSetAlgorithm.cxx
 vtkMultiBlockDataSet.cxx
 vtkMultiPieceDataSet.cxx
@@ -174,6 +189,7 @@ vtkPolyDataToPolyDataFilter.cxx
 vtkPolygon.cxx
 vtkPolyhedron.cxx
 vtkPolyLine.cxx
+vtkPolyPlane.cxx
 vtkPolyVertex.cxx
 vtkProcessObject.cxx
 vtkPropAssembly.cxx
@@ -229,6 +245,7 @@ vtkTreeAlgorithm.cxx
 vtkTree.cxx
 vtkTreeBFSIterator.cxx
 vtkTreeDFSIterator.cxx
+vtkTreeIterator.cxx
 vtkTriangle.cxx
 vtkTriangleStrip.cxx
 vtkTriQuadraticHexahedron.cxx
@@ -251,6 +268,7 @@ vtkWedge.cxx
 
 SET_SOURCE_FILES_PROPERTIES(
 vtkAbstractCellLocator
+vtkAbstractImageInterpolator
 vtkAbstractInterpolatedVelocityField
 vtkAbstractMapper
 vtkAbstractPointLocator
@@ -280,6 +298,7 @@ vtkGenericDataSetAlgorithm
 vtkGenericPointIterator
 vtkGenericSubdivisionErrorMetric
 vtkGraph
+vtkGraphWeightFilter
 vtkHyperOctreeAlgorithm
 vtkHyperOctreeCursor
 vtkHyperOctreePointsGrabber
@@ -318,6 +337,7 @@ vtkStructuredPointsToPolyDataFilter
 vtkStructuredPointsToStructuredPointsFilter
 vtkStructuredPointsToUnstructuredGridFilter
 vtkThreadedImageAlgorithm
+vtkTreeIterator
 vtkUnstructuredGridSource
 vtkUnstructuredGridToPolyDataFilter
 vtkUnstructuredGridToUnstructuredGridFilter
@@ -327,12 +347,25 @@ vtkViewport
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkAMRBox.cxx
+  vtkAtom.cxx
+  vtkBond.cxx
   vtkExecutionSchedulerManager.cxx
   vtkFilteringInformationKeyManager.cxx
+  vtkImageBSplineInternals.cxx
   vtkImageIterator.cxx
   vtkInformation.cxx
   vtkImageProgressIterator.cxx
+  vtkMarchingSquaresLineCases.cxx
+  vtkMarchingCubesTriangleCases.cxx
   WRAP_EXCLUDE
+)
+
+SET_SOURCE_FILES_PROPERTIES(
+  vtkAtom.cxx
+  vtkBond.cxx
+  vtkImageBSplineInternals.cxx
+
+  PROPERTIES WRAP_SPECIAL 1
 )
 
 SET(Kit_EXTRA_SRCS)
@@ -381,8 +414,8 @@ IF(NOT VTK_INSTALL_NO_DEVELOPMENT)
     ${CMAKE_CURRENT_SOURCE_DIR}/vtkCellType.h
     ${CMAKE_CURRENT_SOURCE_DIR}/vtkImageIterator.txx
     ${CMAKE_CURRENT_SOURCE_DIR}/vtkImageProgressIterator.txx
+    ${CMAKE_CURRENT_SOURCE_DIR}/vtkImageInterpolatorInternals.h
     DESTINATION ${VTK_INSTALL_INCLUDE_DIR_CM24}
     COMPONENT Development
     )
 ENDIF(NOT VTK_INSTALL_NO_DEVELOPMENT)
-

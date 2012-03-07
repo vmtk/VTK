@@ -202,12 +202,21 @@ void QVTKWidget2::Start()
 {
   makeCurrent();
   mRenWin->PushState();
-  mRenWin->OpenGLInit();
+  mRenWin->OpenGLInitState();
 }
 
 void QVTKWidget2::End()
 {
   mRenWin->PopState();
+}
+
+void QVTKWidget2::initializeGL()
+{
+  if(!this->mRenWin)
+    {
+    return;
+    }
+  this->mRenWin->OpenGLInitContext();
 }
 
 /*! handle resize event
@@ -377,6 +386,11 @@ void QVTKWidget2::dropEvent(QDropEvent* e)
     {
     mIrenAdapter->ProcessEvent(e, this->mRenWin->GetInteractor());
     }
+}
+  
+bool QVTKWidget2::focusNextPrevChild(bool)
+{
+  return false;
 }
 
 #ifdef VTK_USE_TDX

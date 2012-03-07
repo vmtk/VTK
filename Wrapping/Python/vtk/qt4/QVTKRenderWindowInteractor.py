@@ -217,7 +217,7 @@ class QVTKRenderWindowInteractor(QtGui.QWidget):
         """Shows the cursor."""
         vtk_cursor = self._Iren.GetRenderWindow().GetCurrentCursor()
         qt_cursor = self._CURSOR_MAP.get(vtk_cursor, QtCore.Qt.ArrowCursor)
-        self.setCursor(cursor)
+        self.setCursor(qt_cursor)
 
     def sizeHint(self):
         return QtCore.QSize(400, 400)
@@ -231,9 +231,10 @@ class QVTKRenderWindowInteractor(QtGui.QWidget):
     def resizeEvent(self, ev):
         w = self.width()
         h = self.height()
-
-        self._RenderWindow.SetSize(w, h)
+        vtk.vtkRenderWindow.SetSize(self._RenderWindow, w, h)
         self._Iren.SetSize(w, h)
+        self._Iren.ConfigureEvent()
+        self.update()
 
     def _GetCtrlShift(self, ev):
         ctrl = shift = False

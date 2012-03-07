@@ -16,6 +16,7 @@ vtkImageAnisotropicDiffusion3D.cxx
 vtkImageAppend.cxx
 vtkImageAppendComponents.cxx
 vtkImageBlend.cxx
+vtkImageBSplineCoefficients.cxx
 vtkImageButterworthHighPass.cxx
 vtkImageButterworthLowPass.cxx
 vtkImageCacheFilter.cxx
@@ -52,6 +53,8 @@ vtkImageGaussianSource.cxx
 vtkImageGradient.cxx
 vtkImageGradientMagnitude.cxx
 vtkImageGridSource.cxx
+vtkImageHistogram.cxx
+vtkImageHistogramStatistics.cxx
 vtkImageHSIToRGB.cxx
 vtkImageHSVToRGB.cxx
 vtkImageHybridMedian2D.cxx
@@ -90,7 +93,9 @@ vtkImageRGBToHSV.cxx
 vtkImageRange3D.cxx
 vtkImageRectilinearWipe.cxx
 vtkImageResample.cxx
+vtkImageResize.cxx
 vtkImageReslice.cxx
+vtkImageResliceToColors.cxx
 vtkImageSeedConnectivity.cxx
 vtkImageSeparableConvolution.cxx
 vtkImageShiftScale.cxx
@@ -106,7 +111,9 @@ vtkImageStencilToImage.cxx
 vtkImageStencilAlgorithm.cxx
 vtkImageStencilData.cxx
 vtkImageStencilSource.cxx
+vtkImageSlabReslice.cxx
 vtkImageThreshold.cxx
+vtkImageThresholdConnectivity.cxx
 vtkImageToImageStencil.cxx
 vtkImageTranslateExtent.cxx
 vtkImageVariance3D.cxx

@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================
-  Copyright 2008 Sandia Corporation.
+  Copyright 2011 Sandia Corporation.
   Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
   license for use of this work by or on behalf of the
   U.S. Government. Redistribution and use in source and binary forms, with
@@ -42,11 +42,28 @@
 
 #include <assert.h> // assert() in inline implementations.
 
+#ifndef DBL_MIN
+#  define VTK_DBL_MIN    2.2250738585072014e-308
+#else  // DBL_MIN
+#  define VTK_DBL_MIN    DBL_MIN
+#endif  // DBL_MIN
+
 #ifndef DBL_EPSILON
 #  define VTK_DBL_EPSILON    2.2204460492503131e-16
 #else  // DBL_EPSILON
 #  define VTK_DBL_EPSILON    DBL_EPSILON
 #endif  // DBL_EPSILON
+#include "vtkMathConfigure.h" // For VTK_HAS_ISINF and VTK_HAS_ISNAN
+
+#include <assert.h> // assert() in inline implementations.
+
+#ifndef VTK_DBL_EPSILON
+#  ifndef DBL_EPSILON
+#    define VTK_DBL_EPSILON    2.2204460492503131e-16
+#  else  // DBL_EPSILON
+#    define VTK_DBL_EPSILON    DBL_EPSILON
+#  endif  // DBL_EPSILON
+#endif  // VTK_DBL_EPSILON
 
 class vtkDataArray;
 class vtkPoints;
@@ -563,6 +580,11 @@ public:
   static void Matrix3x3ToQuaternion(const double A[3][3], double quat[4]);
 
   // Description:
+  // Multiply two quaternions. This is used to concatenate rotations
+  static void MultiplyQuaternion( const float q1[4], const float q2[4],  float q[4] );
+  static void MultiplyQuaternion( const double q1[4], const double q2[4],  double q[4] );
+
+  // Description:
   // Orthogonalize a 3x3 matrix and put the result in B.  If matrix A
   // has a negative determinant, then B will be a rotation plus a flip
   // i.e. it will have a determinant of -1.
@@ -776,6 +798,9 @@ public:
   // Description:
   // Convert color in RGB format (Red, Green, Blue) to HSV format
   // (Hue, Saturation, Value). The input color is not modified.
+  // The input RGB must be float values in the range [0,1].
+  // The output ranges are hue [0, 1], saturation [0, 1], and
+  // value [0, 1].
   static void RGBToHSV(const float rgb[3], float hsv[3])
     { RGBToHSV(rgb[0], rgb[1], rgb[2], hsv, hsv+1, hsv+2); }
   static void RGBToHSV(float r, float g, float b, float *h, float *s, float *v);
@@ -835,6 +860,9 @@ public:
 
   // Description:
   // Convert color from the RGB system to CIE-L*ab.
+  // The input RGB must be values in the range [0,1].
+  // The output ranges of 'L' is [0, 100]. The output
+  // range of 'a' and 'b' are approximately [-110, 110].
   static void RGBToLab(const double rgb[3], double lab[3]) {
     RGBToLab(rgb[0], rgb[1], rgb[2], lab+0, lab+1, lab+2);
   }
@@ -954,6 +982,7 @@ public:
   // Test if a number is equal to the special floating point value infinity.
   static int IsInf(double x);
 
+  // Description:
   // Test if a number is equal to the special floating point value Not-A-Number (Nan).
   static int IsNan(double x);
 
@@ -1003,6 +1032,9 @@ inline vtkTypeInt64 vtkMath::Factorial( int N )
 }
 
 //----------------------------------------------------------------------------
+// Modify the trunc() operation provided by static_cast<int>() to get floor(),
+// if x<0 (condition g) and x!=trunc(x) (condition n) then floor(x)=trunc(x)-1
+// Note that in C++ conditions evaluate to values of 1 or 0 (true or false).
 inline int vtkMath::Floor(double x)
 {
   const int r = static_cast<int>(x);
@@ -1012,6 +1044,9 @@ inline int vtkMath::Floor(double x)
 }
 
 //----------------------------------------------------------------------------
+// Modify the trunc() operation provided by static_cast<int>() to get ceil(),
+// if x>=0 (condition g) and x!=trunc(x) (condition n) then ceil(x)=trunc(x)+1
+// Note that in C++ conditions evaluate to values of 1 or 0 (true or false).
 inline int vtkMath::Ceil(double x)
 {
   const int r = static_cast<int>(x);
@@ -1300,5 +1335,21 @@ inline double vtkMath::ClampAndNormalizeValue(double value,
 
   return result;
 }
+
+#if defined(VTK_HAS_ISINF)
+//-----------------------------------------------------------------------------
+inline int vtkMath::IsInf(double x)
+{
+  return (isinf(x) ? 1 : 0);
+}
+#endif
+
+#if defined(VTK_HAS_ISNAN)
+//-----------------------------------------------------------------------------
+inline int vtkMath::IsNan(double x)
+{
+  return (isnan(x) ? 1 : 0);
+}
+#endif
 
 #endif

@@ -17,7 +17,7 @@
  Copyright (c) Sandia Corporation
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
-
+#define VTK_LEGACY_SILENT
 #include "vtkPExodusReader.h"
 
 #ifndef MERGE_CELLS
@@ -45,9 +45,10 @@
 
 #include "vtk_netcdf.h"
 #include "vtk_exodusII.h"
+
 #include <sys/stat.h>
 #include <ctype.h>
-#include <vtkstd/vector>
+#include <vector>
 
 #define DEBUG 0
 #define vtkPExodusReaderMAXPATHLEN 2048
@@ -137,6 +138,7 @@ protected:
 // Instantiate object with NULL filename.
 vtkPExodusReader::vtkPExodusReader()
 {
+  VTK_LEGACY_BODY(vtkPExodusReader, "VTK 5.8");
   this->FilePattern   = 0;
   this->CurrentFilePattern   = 0;
   this->FilePrefix    = 0;

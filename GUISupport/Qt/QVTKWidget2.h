@@ -99,6 +99,8 @@ protected Q_SLOTS:
   virtual void SupportsOpenGL(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data);
 
 protected:
+  // overloaded initialize handler
+  virtual void initializeGL();
   // overloaded resize handler
   virtual void resizeGL(int, int);
   // overloaded paint handler
@@ -133,6 +135,9 @@ protected:
   virtual void dragLeaveEvent(QDragLeaveEvent*);
   // overload drop event
   virtual void dropEvent(QDropEvent*);
+
+  // overload focus handling so tab key is passed to VTK
+  virtual bool focusNextPrevChild(bool);
 
   // the vtk render window
   vtkSmartPointer<vtkGenericOpenGLRenderWindow> mRenWin;
