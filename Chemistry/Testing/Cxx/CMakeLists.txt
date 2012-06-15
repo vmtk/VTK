@@ -26,6 +26,7 @@ IF (VTK_USE_RENDERING AND VTK_USE_CHEMISTRY)
       TestCMLMoleculeReader.cxx
       )
     IF(VTK_USE_OPENQUBE)
+      INCLUDE(${QT_USE_FILE})
       # Add Eigen to the include path for the OpenQube headers
       INCLUDE_DIRECTORIES(${EIGEN2_INCLUDE_DIR})
       SET(MyTests
@@ -46,7 +47,7 @@ IF (VTK_USE_RENDERING AND VTK_USE_CHEMISTRY)
                         vtkVolumeRendering)
 
   SET (TestsToRun ${Tests})
-  REMOVE (TestsToRun ${KIT}CxxTests.cxx)
+  LIST (REMOVE_ITEM TestsToRun ${KIT}CxxTests.cxx)
 
   # Add all the executables
   FOREACH (test ${TestsToRun})
