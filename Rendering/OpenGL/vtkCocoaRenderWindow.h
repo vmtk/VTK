@@ -300,6 +300,9 @@ public:
   void SetPixelFormat(void *pixelFormat);
   void *GetPixelFormat();
 
+  void SetCocoaServer(void *server);            // Really a vtkCocoaServer*
+  void *GetCocoaServer();
+
 protected:
   vtkCocoaRenderWindow();
   ~vtkCocoaRenderWindow();
@@ -318,9 +321,6 @@ protected:
   // It manages all Cocoa objects in this C++ class.
   void SetCocoaManager(void *manager);
   void *GetCocoaManager();
-
-  void SetCocoaServer(void *server);            // Really a vtkCocoaServer*
-  void *GetCocoaServer();
 
 private:
   vtkCocoaRenderWindow(const vtkCocoaRenderWindow&);  // Not implemented.
