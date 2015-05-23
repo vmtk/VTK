@@ -55,6 +55,9 @@
   typedef void *vtkCocoaRenderWindowInteractorRef;
 #endif
 
+#if defined(__APPLE__) && __GNUC__ >=4
+  __attribute__((visibility("default")))
+#endif
 @interface vtkCocoaGLView : NSView
 {
   @private
