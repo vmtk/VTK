@@ -48,6 +48,9 @@ vtkStandardNewMacro(vtkCocoaRenderWindow);
 // It manages the NSWindow of a "pure VTK application",
 // as opposed to a regular Mac app that happens to use VTK.
 //----------------------------------------------------------------------------
+#if defined(__APPLE__) && __GNUC__ >=4
+  __attribute__((visibility("default")))
+#endif
 @interface vtkCocoaServer : NSObject
 {
   @private
